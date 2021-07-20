@@ -92,17 +92,16 @@ def dumpData(server_instance):
     printAndWriteToFile("\n[+] Dumping all accessible data")
     for database_name in data_struct.keys():        
         if data_struct[database_name] is not None:
-            connection,cur = getConnCursor()
             for table_name in data_struct[database_name].keys():
                 print("\n{}.{}.{}:".format(server_instance,database_name,table_name))
                 try:
                     columns = data_struct[database_name][table_name]
                     columns_comma_sep = ",".join(columns)
-                    cur.execute("SELECT {} FROM [{}].{}.dbo.{}".format(columns_comma_sep,server_instance,database_name,table_name))
+                    cursor.execute("SELECT {} FROM [{}].{}.dbo.{}".format(columns_comma_sep,server_instance,database_name,table_name))
                     result_table = PrettyTable(columns)
                     for col in result_table.align.keys():
                         result_table.align[col] = 'l'
-                    for row in cur:
+                    for row in cursor:
                         result_table.add_row([row[column_name] for column_name in columns])
                     result_string = result_table.get_string(print_empty=False)
                     if len(result_string) == 0:
@@ -111,7 +110,6 @@ def dumpData(server_instance):
                         printAndWriteToFile(result_string)        
                 except Exception as e:
                     print(r"{Failed to obtain}")
-        connection.close()
 
 def printAndWriteToFile(s,end="\n"):
     print(s,end=end)
